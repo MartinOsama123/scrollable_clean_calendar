@@ -17,6 +17,10 @@ class ScrollableCleanCalendar extends StatefulWidget {
   /// Scroll controller
   final ScrollController? scrollController;
 
+  final ScrollPhysics? scrollPhysics;
+
+  final Axis scrollDirection;
+
   /// If is to show or not the weekdays in calendar
   final bool showWeekdays;
 
@@ -83,6 +87,8 @@ class ScrollableCleanCalendar extends StatefulWidget {
   const ScrollableCleanCalendar({
     this.locale = 'en',
     this.scrollController,
+    this.scrollPhysics,
+    this.scrollDirection = Axis.vertical,
     this.showWeekdays = true,
     this.layout,
     this.calendarCrossAxisSpacing = 4,
@@ -105,9 +111,9 @@ class ScrollableCleanCalendar extends StatefulWidget {
     this.dayRadius = 6,
     required this.calendarController,
   }) : assert(layout != null ||
-            (monthBuilder != null &&
-                weekdayBuilder != null &&
-                dayBuilder != null));
+      (monthBuilder != null &&
+          weekdayBuilder != null &&
+          dayBuilder != null));
 
   @override
   State<ScrollableCleanCalendar> createState() =>
@@ -131,6 +137,7 @@ class _ScrollableCleanCalendarState extends State<ScrollableCleanCalendar> {
   Widget build(BuildContext context) {
     if (widget.scrollController != null) {
       return listViewCalendar();
+      // return scrollablePositionedListCalendar();
     } else {
       return scrollablePositionedListCalendar();
     }
@@ -139,6 +146,8 @@ class _ScrollableCleanCalendarState extends State<ScrollableCleanCalendar> {
   Widget listViewCalendar() {
     return ListView.separated(
       controller: widget.scrollController,
+      physics: widget.scrollPhysics,
+      scrollDirection: widget.scrollDirection,
       padding: widget.padding ??
           const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
       separatorBuilder: (_, __) =>
@@ -153,71 +162,100 @@ class _ScrollableCleanCalendarState extends State<ScrollableCleanCalendar> {
   }
 
   Widget scrollablePositionedListCalendar() {
-    return ScrollablePositionedList.separated(
-      itemScrollController: widget.calendarController.itemScrollController,
-      padding: widget.padding ??
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-      separatorBuilder: (_, __) =>
-          SizedBox(height: widget.spaceBetweenCalendars),
-      itemCount: widget.calendarController.months.length,
-      itemBuilder: (context, index) {
-        final month = widget.calendarController.months[index];
+    return    ListView.builder(
+        shrinkWrap: true,
+        physics: widget.scrollPhysics,
+        itemCount: widget.calendarController.months.length,
+        scrollDirection: widget.scrollDirection,
+        padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+        itemBuilder:(context, index) {
+          final month = widget.calendarController.months[index];
 
-        return childCollumn(month);
-      },
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            scrollDirection: Axis.vertical,
+            child: childCollumn(month),
+          );
+        }
     );
+
+    // return ScrollablePositionedList.separated(
+    //   itemScrollController: widget.calendarController.itemScrollController,
+    //   physics: widget.scrollPhysics,
+    //   scrollDirection: widget.scrollDirection,
+    //   padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+    //   separatorBuilder: (_, __) => SizedBox(height: widget.spaceBetweenCalendars),
+    //   itemCount: widget.calendarController.months.length,
+    //   itemBuilder: (context, index) {
+    //     final month = widget.calendarController.months[index];
+    //
+    //     return childCollumn(month);
+    //   },
+    // );
   }
 
   Widget childCollumn(DateTime month) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: double.maxFinite,
-          child: MonthWidget(
-            month: month,
-            locale: widget.locale,
-            layout: widget.layout,
-            monthBuilder: widget.monthBuilder,
-            textAlign: widget.monthTextAlign,
-            textStyle: widget.monthTextStyle,
-          ),
-        ),
-        SizedBox(height: widget.spaceBetweenMonthAndCalendar),
-        Column(
-          children: [
-            WeekdaysWidget(
-              showWeekdays: widget.showWeekdays,
-              cleanCalendarController: widget.calendarController,
-              locale: widget.locale,
-              layout: widget.layout,
-              weekdayBuilder: widget.weekdayBuilder,
-              textStyle: widget.weekdayTextStyle,
-            ),
-            AnimatedBuilder(
-              animation: widget.calendarController,
-              builder: (_, __) {
-                return DaysWidget(
+    return SizedBox(
+      width: 300,
+      // height: 200,
+      child: Padding(
+          padding:  const EdgeInsets.all(10.0),
+          child:Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: double.maxFinite,
+                child: MonthWidget(
                   month: month,
-                  cleanCalendarController: widget.calendarController,
-                  calendarCrossAxisSpacing: widget.calendarCrossAxisSpacing,
-                  calendarMainAxisSpacing: widget.calendarMainAxisSpacing,
+                  locale: widget.locale,
                   layout: widget.layout,
-                  dayBuilder: widget.dayBuilder,
-                  backgroundColor: widget.dayBackgroundColor,
-                  selectedBackgroundColor: widget.daySelectedBackgroundColor,
-                  selectedBackgroundColorBetween:
-                      widget.daySelectedBackgroundColorBetween,
-                  disableBackgroundColor: widget.dayDisableBackgroundColor,
-                  dayDisableColor: widget.dayDisableColor,
-                  radius: widget.dayRadius,
-                  textStyle: widget.dayTextStyle,
-                );
-              },
-            )
-          ],
-        )
-      ],
+                  monthBuilder: widget.monthBuilder,
+                  textAlign: widget.monthTextAlign,
+                  textStyle: widget.monthTextStyle,
+                ),
+              ),
+              SizedBox(height: widget.spaceBetweenMonthAndCalendar),
+              Column(
+                children: [
+                  WeekdaysWidget(
+                    showWeekdays: widget.showWeekdays,
+                    cleanCalendarController: widget.calendarController,
+                    locale: widget.locale,
+                    layout: widget.layout,
+                    weekdayBuilder: widget.weekdayBuilder,
+                    textStyle: widget.weekdayTextStyle,
+                  ),
+                  AnimatedBuilder(
+                    animation: widget.calendarController,
+                    builder: (_, __) {
+                      return DaysWidget(
+                        month: month,
+                        cleanCalendarController: widget.calendarController,
+                        calendarCrossAxisSpacing: widget.calendarCrossAxisSpacing,
+                        calendarMainAxisSpacing: widget.calendarMainAxisSpacing,
+                        layout: widget.layout,
+                        dayBuilder: widget.dayBuilder,
+                        backgroundColor: widget.dayBackgroundColor,
+                        selectedBackgroundColor: widget.daySelectedBackgroundColor,
+                        selectedBackgroundColorBetween:
+                        widget.daySelectedBackgroundColorBetween,
+                        disableBackgroundColor: widget.dayDisableBackgroundColor,
+                        dayDisableColor: widget.dayDisableColor,
+                        radius: widget.dayRadius,
+                        textStyle: widget.dayTextStyle,
+                      );
+                    },
+                  )
+                ],
+              )
+            ],
+          )
+        // SingleChildScrollView(
+        //   scrollDirection: Axis.vertical,
+        //   child: ,
+        // ),
+      ),
     );
   }
+
 }
