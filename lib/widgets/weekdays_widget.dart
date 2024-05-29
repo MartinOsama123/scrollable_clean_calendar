@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
 import 'package:scrollable_clean_calendar/utils/enums.dart';
 import 'package:scrollable_clean_calendar/utils/extensions.dart';
@@ -51,10 +50,10 @@ class WeekdaysWidget extends StatelessWidget {
       child: Text(
         weekday.capitalize(),
         style: textStyle ??
-            Theme.of(context).textTheme.bodyText1!.copyWith(
+            Theme.of(context).textTheme.bodySmall!.copyWith(
                   color: Theme.of(context)
                       .textTheme
-                      .bodyText1!
+                      .bodySmall!
                       .color!
                       .withOpacity(.4),
                   fontWeight: FontWeight.bold,
@@ -68,10 +67,10 @@ class WeekdaysWidget extends StatelessWidget {
       child: Text(
         weekday.capitalize(),
         style: textStyle ??
-            Theme.of(context).textTheme.bodyText1!.copyWith(
+            Theme.of(context).textTheme.bodySmall!.copyWith(
                   color: Theme.of(context)
                       .textTheme
-                      .bodyText1!
+                      .bodySmall!
                       .color!
                       .withOpacity(.4),
                   fontWeight: FontWeight.bold,

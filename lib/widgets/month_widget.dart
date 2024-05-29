@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import 'package:scrollable_clean_calendar/utils/enums.dart';
 import 'package:scrollable_clean_calendar/utils/extensions.dart';
 
@@ -41,7 +40,7 @@ class MonthWidget extends StatelessWidget {
     return Text(
       text.capitalize(),
       textAlign: textAlign ?? TextAlign.center,
-      style: textStyle ?? Theme.of(context).textTheme.headline6!,
+      style: textStyle ?? Theme.of(context).textTheme.headlineLarge!,
     );
   }
 
@@ -49,7 +48,7 @@ class MonthWidget extends StatelessWidget {
     return Text(
       text.capitalize(),
       textAlign: textAlign ?? TextAlign.center,
-      style: textStyle ?? Theme.of(context).textTheme.headline6!,
+      style: textStyle ?? Theme.of(context).textTheme.headlineLarge!,
     );
   }
 }
